@@ -2,9 +2,6 @@
 
 Reference : https://www.aquasec.com/wiki/display/containers/Kubernetes+Architecture+101
 
-	Kubernetes is an open source orchestration tool developed by Google for managing microservices or containerized applications across a distributed cluster of nodes. 
-	Kubernetes provides highly resilient infrastructure with zero downtime deployment capabilities, automatic rollback, scaling, and self-healing of containers (which consists of auto-placement, auto-restart, auto-replication , and scaling of containers on the basis of CPU usage).
-
 Kubernetes Components:
 -----------------------
 
@@ -34,7 +31,66 @@ Slave:
 	
 	- kubelet:  the main service on a node, regularly taking in new or modified pod specifications (primarily through the kube-apiserver) and ensuring that pods and their containers are healthy and running in the desired state. This component also reports to the master on the health of the host where it is running.
 	
-	- kubectl :  Command in line tool that interact with kube-apiserver and send commands to master node.Each command is converted into an API call.
+	
+kubectl :  Command in line tool that interact with kube-apiserver and send commands to master node.Each command is converted into an API call.
 
 
 								 
+-------------------------------------------------------------------------
+
+API-Server : Acts as a frient end for kubernetes.Users, management devices, CLI all talk to the api servers to intaract with kubernetes cluster.
+
+etcd : It is going to store all clusters info and  multiple node and master  information
+
+Shcedular : distributing work and containers acrross multiple nodes. It look for newly created containers and assign them to nodes.
+
+Controllers :  These are the brain behind the container orchistration. They are notising and responding when nodes , containers went down. They take a decision to crete a new container when any container/node went down.
+
+Container Runtime : Is an underlying s/w that is used to run containers. ex: docker
+
+kubelet :  Is an agent that runs on each node.These are responsible for running the containers on nodes as expected.
+
+Kubectl : Used to deploy and manage applications on kubernetes cluster. to get the cluster information, managing of other nodes.
+
+
+----------------------------------------------------------
+
+Deployments
+pods
+services
+replica sets
+
+
+------------------------------------------------
+
+
+Problem With Normal-Container-Management :
+
+ 	- Scale-up/Scale-Down the containers.
+ 	- Load balancing of all containers.
+ 	- Self Healing of the containers & Servers.
+ 	- Scheduling 
+ 	- Networking
+ 	- Deployment
+ 	- Dashboard
+
+
+
+
+
+
+
+
+------------------------------------------------
+
+https://www.codeooze.com/windows-10/windows-10-ubuntu-vbox/
+
+
+
+
+
+
+
+
+
+ 

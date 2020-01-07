@@ -38,6 +38,7 @@
     Specify the URL for 
     
                     http://afonsof.com/jenkins-material-theme/dist/material-teal.css
+                    Plugin Info URL : http://afonsof.com/jenkins-material-theme/
 
     Click Save
 
@@ -123,6 +124,87 @@
                         }
                     }
                 }
+                
+                ----------------------------------------------------------------------------------------------------------------
+                
+                        #!/groovy
+
+                        def branch
+
+                        pipeline{
+                            agent any
+                            stages{
+                                stage('Clean'){
+                                    steps{
+                                        echo "Deleting workspace"
+                                        deleteDir()
+                                    }
+
+                                }
+
+                                stage('Checkout'){
+                                    steps{
+                                        checkout scm
+                                        script{
+                                            branch = env.BRANCH_NAME
+                                            echo "The current branch is ${branch}"
+                                        }
+
+                                    }
+
+                                }
+
+                                stage('Compile'){
+                                    steps{
+                                        script{
+                                        sh 'mvn clean compile'
+
+                                        }
+                                    }
+
+
+                                }
+
+                                stage('Testing'){
+                                    steps{
+                                        script{
+                                        sh 'mvn test'
+                                        }
+                                    }
+                                }
+
+                                stage('Build'){
+                                    steps{
+                                        script{
+                                            sh 'mvn package'
+                                        }
+                                    }
+                                }
+
+                                stage('Dev Code Deployment'){
+                                    when {
+                                        expression { branch == 'dev'}
+                                    }
+                                    steps{
+                                        script{
+                                            echo "Development code is deploying"
+                                        }
+                                    }
+                                }
+
+                                stage('Master Code Deployment'){
+                                    when {
+                                        expression { branch == 'master'}
+                                    }
+                                    steps{
+                                        script{
+                                            echo "Production code is deploying"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+    -------------------------------------------------------------------------------------------------------------
     - Scripted Pipeline (Through code)
     
             node{
@@ -147,7 +229,11 @@
 
                 sh 'sh /opt/docker_installation.sh'
               }
-    
+              
+### Variables to shell script
+
+        https://ci.eclipse.org/webtools/env-vars.html/
+        Ref : https://stackoverflow.com/questions/41229418/how-to-check-if-a-pipeline-is-triggered-from-a-pull-request
 ## Jenkins lock
 
     If you want to lock the jenkins to prevent further executions then you can achive it in two levels

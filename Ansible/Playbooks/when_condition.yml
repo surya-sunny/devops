@@ -1,12 +1,12 @@
 ---
 - name: When_Condition example
-  hosts: appgroup
+  hosts: all
+  become: True
   gather_facts: True
 
   tasks:
-  - name: Apache installation
+  - name: Apache Uninstall
     yum: name=httpd state=absent
-    when: ansible_distribution == 'CentOS' 
 
   - name: Apapche iNstallation on Ubuntu
     apt: name=apache2 state=latest

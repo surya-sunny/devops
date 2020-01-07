@@ -32,7 +32,112 @@ while True:
 	if c==10:
 		break
     
+    ----------------------------------------------------------------------------------------------------
     
+    import json
+import os
+import psutil
+import time as t
+import socket
+from datetime import datetime
+from influxdb import InfluxDBClient
+client = InfluxDBClient("3.91.94.124", 8086, "admin", "admin")
+value = client.get_list_database()
+print(value)
+client.switch_database('met_db')
+c=0
+while True:
+    c+=1
+    time=datetime.now()
+
+    # HostName
+    hostname = socket.gethostname()
+	
+	# Ip Addre
+    IPAddr = socket.gethostbyname(hostname)
+	
+	# Cpu Info
+    CPU_Pct=round(float(os.popen('''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),2)
+	
+	# Memory Usase
+    pid = os.getpid()
+    py = psutil.Process(pid)
+    memoryUse = round(py.memory_info()[0]/2.**30,2)
+    # Volume Usase
+    def disk_stat(path):
+        disk = os.statvfs(path)
+        percent = (disk.f_blocks - disk.f_bfree) * 100 / (disk.f_blocks -disk.f_bfree + disk.f_bavail) + 1
+        return percent
+
+    volume = disk_stat('/')
+
+    json_body = [
+        {
+            "measurement": "metrics",
+            "tags": {
+                "user": "anand1",
+            },
+            "time": time,
+            "fields": {
+                "hos": hostname,
+				"ip": IPAddr,
+                "cpu": CPU_Pct,
+                "mem": memoryUse,
+                "vol": volume
+            }
+        }
+    ]
+    client.write_points(json_body)
+    t.sleep(2)
+    if c==10000:
+       break
+    ----------------------------------------------------------------------------------------------------
+ 
+ 
+## Grafana Installation :
+
+#### 1. Install Grafana using the installation instructions: 
+
+	$ wget https://grafanarel.s3.amazonaws.com/builds/grafana_3.0.4-1464167696_amd64.deb
+	$ sudo apt-get install -y adduser libfontconfig
+	$ sudo dpkg -i grafana_3.0.4-1464167696_amd64.deb
+
+
+#### 2. Start the server and automatically start the server on boot up
+	
+	- sudo service grafana-server start
+	- sudo systemctl enable grafana-server.service
+	
+#### 3. Test
+
+        - In your browser, go to localhost:3000
+        - Log in as (user) admin, (password) admin
+
+
+
+## Influx DB Installation
+
+#### Update the server
+
+        - apt-get update
+	- apt-get upgrade
+	
+#### Adding the influx package to apt repository
+
+	curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+	source /etc/lsb-release
+	echo "deb https://repos.influxdata.com/${DISTRIB_ID,,} ${DISTRIB_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+
+#### Install the InfluxDB
+
+	sudo apt-get update && sudo apt-get install influxdb
+	
+#### Start the Influx 
+
+	sudo service influxdb start
+	
+-------------------------------------------------------------------------------------------------------------------------------------
+ 
     
     
    Others:
@@ -213,3 +318,54 @@ http://www.compassmentis.com/2016/06/grafana-influxdb-and-python-simple-sample/ 
 https://www.influxdata.com/blog/getting-started-python-influxdb/
 
 http://www.andremiller.net/content/grafana-and-influxdb-quickstart-on-ubuntu     ---Influxdb Installation
+
+
+Others : 
+--------------
+
+## Grafana Installation :
+
+#### 1. Install Grafana using the installation instructions: 
+
+	$ wget https://grafanarel.s3.amazonaws.com/builds/grafana_3.0.4-1464167696_amd64.deb
+	$ sudo apt-get install -y adduser libfontconfig
+	$ sudo dpkg -i grafana_3.0.4-1464167696_amd64.deb
+
+
+#### 2. Start the server and automatically start the server on boot up
+	
+	- sudo service grafana-server start
+	- sudo systemctl enable grafana-server.service
+	
+#### 3. Test
+
+        - In your browser, go to localhost:3000
+        - Log in as (user) admin, (password) admin
+
+
+
+## Influx DB Installation
+
+#### Update the server
+
+        - apt-get update
+	- apt-get upgrade
+	
+#### Adding the influx package to apt repository
+
+	curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+	source /etc/lsb-release
+	echo "deb https://repos.influxdata.com/${DISTRIB_ID,,} ${DISTRIB_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+
+#### Install the InfluxDB
+
+	sudo apt-get update && sudo apt-get install influxdb
+	
+#### Start the Influx 
+
+	sudo service influxdb start
+	
+
+
+
+
